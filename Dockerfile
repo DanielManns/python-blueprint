@@ -8,7 +8,7 @@
 #     subtle errors when using MUSL.
 #   - These Python packages usually only provide binary wheels for GLIBC, so the packages
 #     will need to be recompiled fully within the Docker images, increasing build times.
-FROM python:3.10-slim-bookworm AS python_builder
+FROM python:3.12.0 AS python_builder
 
 # Pin Poetry to a specific version to make Docker builds reproducible.
 ENV POETRY_VERSION 1.7.0
@@ -60,7 +60,7 @@ RUN poetry build && \
 
 ## Final Image
 # The image used in the final image MUST match exactly to the python_builder image.
-FROM python:3.10-slim-bookworm
+FROM python:3.12.0
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONBUFFERED 1
