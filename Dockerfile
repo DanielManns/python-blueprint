@@ -8,10 +8,13 @@
 #     subtle errors when using MUSL.
 #   - These Python packages usually only provide binary wheels for GLIBC, so the packages
 #     will need to be recompiled fully within the Docker images, increasing build times.
-FROM python:3.12.0 AS python_builder
 
 # Pin Poetry to a specific version to make Docker builds reproducible.
-ENV POETRY_VERSION 1.7.0
+ARG POETRY_VERSION=1.7.0
+
+#######################################################################################################################
+# Preparation image
+FROM python:3.12.0 AS poetry
 
 # Set ENV variables that make Python more friendly to running inside a container.
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -32,6 +35,7 @@ WORKDIR ${WORKDIR}
 
 # Install Poetry into the global environment to isolate it from the venv. This prevents Poetry
 # from uninstalling parts of itself.
+ARG POETRY_VERSION
 RUN pip install "poetry==${POETRY_VERSION}"
 
 # Pre-download/compile wheel dependencies into a virtual environment.
@@ -45,22 +49,38 @@ ENV PATH "${VIRTUAL_ENV}/bin:${PATH}"
 # Copy in project dependency specification.
 COPY pyproject.toml poetry.lock ./
 
-# Don't install the package itself with Poetry because it will install it as an editable install.
-# TODO: Improve this when non-editable `poetry install` is supported in Poetry.
-#    https://github.com/python-poetry/poetry/issues/1382
-RUN poetry install --only main --no-root
-
 # Copy in source files.
 COPY README.md ./
 COPY src src
+
+#######################################################################################################################
+# Build venv for dev image
+FROM prep AS dev_builder
+# Don't install the package itself with Poetry because it will install it as an editable install.
+# TODO: Improve this when non-editable `poetry install` is supported in Poetry.
+#    https://github.com/python-poetry/poetry/issues/1382
+RUN poetry install --no-root
 
 # Manually build/install the package.
 RUN poetry build && \
     pip install dist/*.whl
 
-## Final Image
+#######################################################################################################################
+# Build environment for prod image
+FROM prep AS prod_builder
+# Don't install the package itself with Poetry because it will install it as an editable install.
+# TODO: Improve this when non-editable `poetry install` is supported in Poetry.
+#    https://github.com/python-poetry/poetry/issues/1382
+RUN poetry install --only main --no-root
+
+# Manually build/install the package.
+RUN poetry build && \
+    pip install dist/*.whl
+
+#######################################################################################################################
+## Base Image
 # The image used in the final image MUST match exactly to the python_builder image.
-FROM python:3.12.0
+FROM python:3.12.0 AS base
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONBUFFERED 1
@@ -69,6 +89,7 @@ ENV VIRTUAL_ENV /opt/venv
 
 ENV HOME /home/user
 ENV APP_HOME ${HOME}/app
+ENV PATH "${VIRTUAL_ENV}/bin:${PATH}"
 
 # Create the home directory for the new user.
 RUN mkdir -p ${HOME}
@@ -86,9 +107,32 @@ RUN mkdir ${APP_HOME}
 
 WORKDIR ${APP_HOME}
 
+#######################################################################################################################
+## Final dev image
+FROM base AS dev
+
+# Install poetry
+ARG POETRY_VERSION
+RUN pip install "poetry==${POETRY_VERSION}"
+
 # Copy and activate pre-built virtual environment.
-COPY --from=python_builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
-ENV PATH "${VIRTUAL_ENV}/bin:${PATH}"
+COPY --from=dev_builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+
+# For Python applications that are not installable libraries, you may need to copy in source
+# files here in the final image rather than in the python_builder image.
+
+# Give access to the entire home folder to the new user so that files and folders can be written
+# there. Some packages such as matplotlib, want to write to the home folder.
+RUN chown -R user:user ${HOME}
+
+ENTRYPOINT ["fact"]
+
+#######################################################################################################################
+## Final prod image
+FROM base AS prod
+
+# Copy and activate pre-built virtual environment.
+COPY --from=prod_builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 # For Python applications that are not installable libraries, you may need to copy in source
 # files here in the final image rather than in the python_builder image.
