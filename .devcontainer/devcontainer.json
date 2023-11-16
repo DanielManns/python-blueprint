@@ -7,7 +7,7 @@
 		"context": "..",
 		// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
 		"dockerfile": "../Dockerfile"
-	}
+	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
@@ -19,8 +19,34 @@
 	// "postCreateCommand": "cat /etc/os-release",
 
 	// Configure tool-specific properties.
-	// "customizations": {},
-
-	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "devcontainer"
+	"customizations": {
+		"vscode":{
+			"extensions": [
+				"ms-python.python",
+				"ms-toolsai.jupyter",
+				"charliermarsh.ruff",
+				"ms-python.mypy-type-checker",
+				"tamasfe.even-better-toml",
+				"njpwerner.autodocstring"
+			],
+			"settings": {
+				"[python]": {
+					"editor.codeActionsOnSave": {
+						"source.organizeImports": true
+					}
+				},
+				"autoDocstring.docstringFormat": "google-notypes",
+				"autoDocstring.startOnNewLine": true,
+				"editor.defaultFormatter": "charliermarsh.ruff",
+				"editor.formatOnpaste": false,
+				"editor.formatOnSave": true,
+				"python.formatting.provider": "black",
+				"python.defaultInterpreterPath": "/opt/venv/bin/python"
+			}
+		}
+	}
 }
+// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
+// "remoteUser": "devcontainer"
+
+
