@@ -13,8 +13,8 @@
 ARG POETRY_VERSION=1.7.0
 
 #######################################################################################################################
-# Preparation image
-FROM python:3.12.0 AS poetry
+# Base builder image
+FROM python:3.12.0 AS base_builder
 
 # Set ENV variables that make Python more friendly to running inside a container.
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -55,7 +55,7 @@ COPY src src
 
 #######################################################################################################################
 # Build venv for dev image
-FROM prep AS dev_builder
+FROM base_builder AS dev_builder
 # Don't install the package itself with Poetry because it will install it as an editable install.
 # TODO: Improve this when non-editable `poetry install` is supported in Poetry.
 #    https://github.com/python-poetry/poetry/issues/1382
@@ -67,7 +67,7 @@ RUN poetry build && \
 
 #######################################################################################################################
 # Build environment for prod image
-FROM prep AS prod_builder
+FROM base_builder AS prod_builder
 # Don't install the package itself with Poetry because it will install it as an editable install.
 # TODO: Improve this when non-editable `poetry install` is supported in Poetry.
 #    https://github.com/python-poetry/poetry/issues/1382
@@ -111,7 +111,7 @@ WORKDIR ${APP_HOME}
 ## Final dev image
 FROM base AS dev
 
-# Install poetry
+# Install poetry (only in dev)
 ARG POETRY_VERSION
 RUN pip install "poetry==${POETRY_VERSION}"
 
