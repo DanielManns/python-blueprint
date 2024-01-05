@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "fact"
+name = "python-blueprint"
 version = "1.0.0"
 description = "Example Python project using best practices"
 authors = ["John Hagen <johnthagen@gmail.com>"]
@@ -26,7 +26,7 @@ classifiers = [
 # Some packages, such as scipy, constrain their upper bound of Python versions they support.
 # Without also constraining the upper bound here, Poetry will not select those versions and will
 # result in an old version being resolved/locked.
-python = "3.10"
+python = "^3.10, <3.11"
 rich = "*"
 typer = { version = "*", extras = ["all"] }
 
