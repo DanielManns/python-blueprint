@@ -5,7 +5,7 @@ from typing import Annotated
 from rich.console import Console
 from typer import Argument, Typer
 
-from fact.lib import factorial
+from app.lib import factorial
 
 app = Typer(add_completion=False)
 

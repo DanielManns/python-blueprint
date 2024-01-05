@@ -14,7 +14,7 @@ ARG POETRY_VERSION=1.7.0
 
 #######################################################################################################################
 # Base builder image
-FROM python:3.12.0 AS base_builder
+FROM python:3.10 AS base_builder
 
 # Set ENV variables that make Python more friendly to running inside a container.
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -80,7 +80,7 @@ RUN poetry build && \
 #######################################################################################################################
 ## Base Image
 # The image used in the final image MUST match exactly to the python_builder image.
-FROM python:3.12.0 AS base
+FROM python:3.10 AS base
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONBUFFERED 1
@@ -125,7 +125,7 @@ COPY --from=dev_builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 # there. Some packages such as matplotlib, want to write to the home folder.
 RUN chown -R user:user ${HOME}
 
-ENTRYPOINT ["fact"]
+ENTRYPOINT ["app"]
 
 #######################################################################################################################
 ## Final prod image
@@ -141,4 +141,4 @@ COPY --from=prod_builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 # there. Some packages such as matplotlib, want to write to the home folder.
 RUN chown -R user:user ${HOME}
 
-ENTRYPOINT ["fact"]
+ENTRYPOINT ["app"]

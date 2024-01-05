@@ -1,6 +1,6 @@
 import pytest
 
-from fact.lib import InvalidFactorialError, factorial
+from app.lib import InvalidFactorialError, factorial
 
 
 @pytest.mark.parametrize(
