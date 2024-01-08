@@ -7,10 +7,10 @@ from typer import Argument, Typer
 
 from app.lib import factorial
 
-app = Typer(add_completion=False)
+typer = Typer(add_completion=False)
 
 
-@app.command()
+@typer.command()
 def main(n: Annotated[int, Argument(min=0, help="The input n of fact(n)")]) -> None:
     """Compute factorial of a given input."""
 
@@ -19,4 +19,4 @@ def main(n: Annotated[int, Argument(min=0, help="The input n of fact(n)")]) -> N
 
 # Allow the script to be run standalone (useful during development).
 if __name__ == "__main__":
-    app()
+    typer()

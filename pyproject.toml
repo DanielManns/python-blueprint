@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "python-blueprint"
+name = "app"
 version = "1.0.0"
 description = "Example Python project using best practices"
 authors = ["John Hagen <johnthagen@gmail.com>"]
@@ -58,7 +58,7 @@ mkdocs-gen-files = "*"
 mkdocs-literate-nav = "*"
 
 [tool.poetry.scripts]
-app = "app.cli:app"
+app = "app.cli:typer"
 
 [build-system]
 requires = ["poetry-core"]
@@ -101,7 +101,7 @@ extend-immutable-calls = ["typer.Argument"]
 
 [tool.black]
 line-length = 99
-target-version = ["py38", "py39", "py310", "py311", "py312"]
+target-version = ["py310"]
 # black will automatically exclude all files listed in .gitignore
 # If you need to exclude additional folders, consider using extend-exclude to avoid disabling the
 # default .gitignore behaviour.
