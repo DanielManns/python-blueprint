@@ -28,7 +28,8 @@
 				"charliermarsh.ruff",
 				"ms-python.mypy-type-checker",
 				"tamasfe.even-better-toml",
-				"njpwerner.autodocstring"
+				"njpwerner.autodocstring",
+				"github.vscode-github-actions"
 			],
 			"settings": {
 				"[python]": {
