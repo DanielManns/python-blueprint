@@ -51,6 +51,7 @@ COPY pyproject.toml poetry.lock ./
 
 # Copy in source files.
 COPY README.md ./
+COPY src src
 
 #######################################################################################################################
 # Build venv for dev image
@@ -61,8 +62,8 @@ FROM base_builder AS dev_builder
 RUN poetry install --no-root
 
 # Manually build/install the package.
-# RUN poetry build && \
-#     pip install dist/*.whl
+RUN poetry build && \
+    pip install dist/*.whl
 
 #######################################################################################################################
 # Build environment for prod image

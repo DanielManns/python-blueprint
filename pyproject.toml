@@ -26,17 +26,9 @@ classifiers = [
 # Some packages, such as scipy, constrain their upper bound of Python versions they support.
 # Without also constraining the upper bound here, Poetry will not select those versions and will
 # result in an old version being resolved/locked.
-python = "^3.9, <3.11"
-jupyter = "*"
-numpy = "*"
-pandas = "*"
-torch = "2.1.0"
-keras = "^3.0.0"
-scikit-learn = "*"
-matplotlib = "*"
+python = "^3.10, <3.11"
 rich = "*"
-xgboost = "*"
-dataprep = "0.4.5"
+typer = { version = "*", extras = ["all"] }
 
 [tool.poetry.group.nox.dependencies]
 nox-poetry = "*"
