@@ -74,8 +74,8 @@ FROM base_builder AS prod_builder
 RUN poetry install --only main --no-root
 
 # Manually build/install the package.
-# RUN poetry build && \
-#     pip install dist/*.whl
+RUN poetry build && \
+    pip install dist/*.whl
 
 #######################################################################################################################
 ## Base Image
