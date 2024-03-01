@@ -7,6 +7,25 @@ env:
   PYTHON_VERSION: "3.10"
 
 jobs:
+  test:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry==${POETRY_VERSION}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          # https://github.com/actions/setup-python#caching-packages-dependencies
+          cache: poetry
+      - name: Install Nox
+        run: poetry install --only nox
+      - name: Test with Nox
+        run: poetry run nox -s test-${{ matrix.python-version }}
   quality:
     runs-on: ubuntu-22.04
     strategy:
@@ -15,6 +34,7 @@ jobs:
           - { nox-session: lint, poetry-groups: "lint" }
           # type_check needs main and test dependencies for inline type annotations.
           - { nox-session: type_check, poetry-groups: "type_check,main,test" }
+          - { nox-session: docs, poetry-groups: "docs" }
     steps:
       - uses: actions/checkout@v3
       - name: Install poetry
